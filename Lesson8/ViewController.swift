@@ -23,9 +23,12 @@ class ViewController: UIViewController {
 //        tableView.rowHeight = UITableView.automaticDimension
         tableView.register(HeroCell.self, forCellReuseIdentifier: customCellId)
         tableView.register(CustomHeaderView.self, forHeaderFooterViewReuseIdentifier: customHeaderId)
+        tableView.dragInteractionEnabled = true
+        tableView.dragDelegate = self
+        tableView.dropDelegate = self
         return tableView
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -76,7 +79,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return data[section].heroes.count
     }
-    
+
     func numberOfSections(in tableView: UITableView) -> Int {
         return data.count
     }
@@ -87,22 +90,22 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         cell.setupCell(name: model.name, realName: model.realName, image: model.imageName)
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: customHeaderId) as! CustomHeaderView
         let model = data[section]
         header.setupHeader(title: model.parameter)
         return header
     }
-    
+
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 60
     }
-    
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 76
     }
-    
+
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             tableView.beginUpdates()
@@ -112,14 +115,43 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let itemToMove = data[sourceIndexPath.section].heroes[sourceIndexPath.row]
-        data[sourceIndexPath.section].heroes.remove(at: sourceIndexPath.row)
-        data[sourceIndexPath.section].heroes.insert(itemToMove, at: destinationIndexPath.row)
+        let hero = self.data[sourceIndexPath.section].heroes.remove(at: sourceIndexPath.row)
+        self.data[destinationIndexPath.section].heroes.insert(hero, at: destinationIndexPath.row)
+        tableView.reloadData()
+    }
+}
+
+//MARK: - UITableViewDragDelegate, UITableViewDropDelegate
+extension ViewController: UITableViewDragDelegate, UITableViewDropDelegate {
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let item = UIDragItem(itemProvider: NSItemProvider())
+        item.localObject = indexPath
+        return [item]
+    }
+
+    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
+        guard let item = coordinator.session.items.first,
+              let sourceIndexPath = item.localObject as? IndexPath,
+              let destinationIndexPath = coordinator.destinationIndexPath
+        else {
+            return
+        }
+
+        switch coordinator.proposal.intent {
+          case .insertAtDestinationIndexPath:
+            tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
+            coordinator.drop(item, toRowAt: destinationIndexPath)
+          default:
+            break
+        }
     }
     
+    func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
+        if session.items.first != nil {
+            return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+        } else {
+            return UITableViewDropProposal(operation: .forbidden)
+        }
+    }
 }
