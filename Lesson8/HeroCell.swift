@@ -50,9 +50,7 @@ final class HeroCell: UITableViewCell {
         } else {
             self.imageHero.image = UIImage(systemName: "person")
         }
-        if realName == nil {
-            self.realName.isHidden = true
-        } else {
+        if realName != nil {
             self.realName.text = realName
         }
     }
@@ -71,7 +69,7 @@ extension HeroCell {
             imageHero.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             imageHero.widthAnchor.constraint(equalToConstant: 60),
             imageHero.heightAnchor.constraint(equalToConstant: 60),
-            imageHero.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
+//            imageHero.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
             
             name.topAnchor.constraint(equalTo: imageHero.topAnchor),
             name.leadingAnchor.constraint(equalTo: imageHero.trailingAnchor, constant: 8),
@@ -79,8 +77,8 @@ extension HeroCell {
             
             realName.topAnchor.constraint(equalTo: name.bottomAnchor, constant: 1),
             realName.leadingAnchor.constraint(equalTo: imageHero.trailingAnchor, constant: 8),
-            realName.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            realName.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
+            realName.trailingAnchor.constraint(equalTo: name.trailingAnchor),
+//            realName.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
         ])
     }
 }

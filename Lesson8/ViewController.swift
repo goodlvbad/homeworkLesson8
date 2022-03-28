@@ -19,8 +19,8 @@ class ViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.estimatedRowHeight = 100
-        tableView.rowHeight = UITableView.automaticDimension
+//        tableView.estimatedRowHeight = 78
+//        tableView.rowHeight = UITableView.automaticDimension
         tableView.register(HeroCell.self, forCellReuseIdentifier: customCellId)
         tableView.register(CustomHeaderView.self, forHeaderFooterViewReuseIdentifier: customHeaderId)
         return tableView
@@ -61,9 +61,9 @@ extension ViewController {
     }
     
     private func setupNavigationBarItems() {
-        self.title = "Marvel".uppercased()
+        title = "Marvel".uppercased()
         let addItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAddButton))
-        self.navigationItem.rightBarButtonItem = addItem
+        navigationItem.rightBarButtonItem = addItem
     }
     
     @objc private func didTapAddButton() {
@@ -99,10 +99,16 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         return 60
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 76
+    }
+    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            tableView.beginUpdates()
             data[indexPath.section].heroes.remove(at: indexPath.row)
-            tableView.reloadData()
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            tableView.endUpdates()
         }
     }
     
