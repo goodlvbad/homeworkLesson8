@@ -50,8 +50,10 @@ final class HeroCell: UITableViewCell {
         } else {
             self.imageHero.image = UIImage(systemName: "person")
         }
-        if realName != nil {
+        if let realName = realName {
             self.realName.text = realName
+        } else {
+            self.realName.text = ""
         }
     }
 }

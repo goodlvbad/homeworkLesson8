@@ -8,7 +8,7 @@
 import UIKit
 
 class ViewController: UIViewController {
-    
+
     private let customCellId = "customCellId"
     private let customHeaderId = "customHeaderId"
     
@@ -70,7 +70,13 @@ extension ViewController {
     }
     
     @objc private func didTapAddButton() {
-        print("didTapAddButton")
+        let section = Int.random(in: 0...models.count - 1)
+        let randomHeroIndex = Int.random(in: 0...models[section].heroes.count - 1)
+        let randomHero = models[section].heroes[randomHeroIndex]
+        data[0].heroes.append(randomHero)
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
 }
 
